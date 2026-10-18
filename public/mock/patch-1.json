@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "added": [
+    {
+      "id": "zzztest",
+      "w": "zzztest",
+      "ph": "/zɪzɪk/",
+      "pos": "n.",
+      "cn": "增量更新测试词",
+      "tag": "cet6"
+    }
+  ],
+  "updated": [
+    {
+      "id": "abandon",
+      "w": "abandon",
+      "ph": "/əˈbændən/",
+      "pos": "vt.",
+      "cn": "【已更新】放弃，抛弃，遗弃",
+      "tag": "cet4"
+    }
+  ],
+  "removed": ["abandonment"]
+}

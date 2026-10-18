@@ -1,0 +1,19 @@
+{
+  "name": "EnglishL · 四六级单词卡",
+  "short_name": "EnglishL",
+  "description": "离线四六级单词卡：滑动记忆、错题本、段位养成",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141821",
+  "theme_color": "#141821",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

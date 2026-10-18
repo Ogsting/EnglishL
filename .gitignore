@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.local
+*.log
+.DS_Store
+Thumbs.db
+
+# 词库原始数据：只保留 ECDICT 切片（生成 words.json 的输入），其余几十 MB 的中间文件不入库
+research/*
+!research/build_cet4.json
+!research/build_cet6.json
+
+# 工具产生的临时目录 / 截图
+*.tmpdir/
