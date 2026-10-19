@@ -20,9 +20,10 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 const dx = ref(0)
 const dy = ref(0)
 const dragging = ref(false)
-const busy = ref(false)
 const flipped = ref(false)
 const leaving = ref<'' | 'left' | 'right'>('')
+/** 已判定方向、翻面等待用户点击的挂起状态 */
+const pending = ref<'' | 'left' | 'right'>('')
 
 let startX = 0
 let startY = 0
@@ -48,7 +49,7 @@ const knowStamp = computed(() => Math.max(0, Math.min(1, (-dx.value - 26) / 70))
 const unknownStamp = computed(() => Math.max(0, Math.min(1, (dx.value - 26) / 70)))
 
 function onDown(e: PointerEvent) {
-  if (busy.value) return
+  if (leaving.value) return
   dragging.value = true
   startX = e.clientX
   startY = e.clientY
@@ -56,22 +57,27 @@ function onDown(e: PointerEvent) {
 }
 
 function onMove(e: PointerEvent) {
-  if (!dragging.value || busy.value) return
+  if (!dragging.value || pending.value) return
   dx.value = e.clientX - startX
   dy.value = e.clientY - startY
 }
 
-async function commit(dir: 'right' | 'left') {
-  busy.value = true
+/** 滑过阈值：回弹 + 翻面展示释义，然后停住，等用户点击 */
+function commit(dir: 'right' | 'left') {
   dragging.value = false
-  // 松手先弹回中间，再翻面展示释义，最后飞出去
   dx.value = 0
   dy.value = 0
   flipped.value = true
-  await wait(360)
-  await wait(420)
+  pending.value = dir
+}
+
+/** 用户点击后才真正飞出并结算 */
+async function finish() {
+  const dir = pending.value
+  if (!dir) return
+  pending.value = ''
   leaving.value = dir
-  await wait(310)
+  await wait(320)
   emit('grade', dir === 'left' ? 'know' : 'unknown')
 }
 
@@ -79,11 +85,21 @@ function onUp() {
   if (!dragging.value) return
   dragging.value = false
   const d = dx.value
+  const tap = Math.abs(d) < 8 && Math.abs(dy.value) < 10
+
+  // 已翻面等确认：点一下才继续
+  if (pending.value) {
+    dx.value = 0
+    dy.value = 0
+    if (tap) finish()
+    return
+  }
+
   if (Math.abs(d) > THRESHOLD) {
     commit(d > 0 ? 'right' : 'left')
     return
   }
-  if (Math.abs(d) < 8 && Math.abs(dy.value) < 10) flipped.value = !flipped.value
+  if (tap) flipped.value = !flipped.value
   dx.value = 0
   dy.value = 0
 }
@@ -130,7 +146,8 @@ function onCancel() {
         </div>
         <div class="foot">
           <span>{{ word.tag === 'cet6' ? '六级' : word.tag === 'own' ? '自建词' : '四级' }}</span>
-          <span>{{ leaving === 'left' ? '已记录' : leaving === 'right' ? '已加入错题本' : '' }}</span>
+          <span v-if="pending" class="next">点击卡片继续 ›</span>
+          <span v-else>{{ leaving === 'left' ? '已记录' : leaving === 'right' ? '已加入错题本' : '' }}</span>
         </div>
       </div>
     </div>

@@ -344,6 +344,26 @@ body {
   margin-right: 4px;
 }
 
+/* 翻面后等用户点击继续 */
+.face .foot .next {
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  animation: tap-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tap-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+}
+
 .face .foot {
   margin-top: auto;
   display: flex;
