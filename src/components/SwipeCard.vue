@@ -43,8 +43,9 @@ const shellStyle = computed(() => {
   }
 })
 
-const knowStamp = computed(() => Math.max(0, Math.min(1, (dx.value - 26) / 70)))
-const unknownStamp = computed(() => Math.max(0, Math.min(1, (-dx.value - 26) / 70)))
+// 左滑 = 认识（绿色印章出现在右侧），右滑 = 不认识（红色印章出现在左侧）
+const knowStamp = computed(() => Math.max(0, Math.min(1, (-dx.value - 26) / 70)))
+const unknownStamp = computed(() => Math.max(0, Math.min(1, (dx.value - 26) / 70)))
 
 function onDown(e: PointerEvent) {
   if (busy.value) return
@@ -71,7 +72,7 @@ async function commit(dir: 'right' | 'left') {
   await wait(420)
   leaving.value = dir
   await wait(310)
-  emit('grade', dir === 'right' ? 'know' : 'unknown')
+  emit('grade', dir === 'left' ? 'know' : 'unknown')
 }
 
 function onUp() {
@@ -114,7 +115,7 @@ function onCancel() {
         </div>
         <div class="foot">
           <span>轻点看答案</span>
-          <span>左滑不认识 · 右滑认识</span>
+          <span>← 左滑认识 · 右滑不认识 →</span>
         </div>
       </div>
 
@@ -129,7 +130,7 @@ function onCancel() {
         </div>
         <div class="foot">
           <span>{{ word.tag === 'cet6' ? '六级' : word.tag === 'own' ? '自建词' : '四级' }}</span>
-          <span>{{ leaving === 'left' ? '已加入错题本' : leaving === 'right' ? '已记录' : '' }}</span>
+          <span>{{ leaving === 'left' ? '已记录' : leaving === 'right' ? '已加入错题本' : '' }}</span>
         </div>
       </div>
     </div>

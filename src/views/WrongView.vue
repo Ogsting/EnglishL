@@ -70,7 +70,7 @@ function cancel(id: string) {
     </div>
   </div>
 
-  <div class="list">
+  <div class="list panel-wrong">
     <div
       v-for="e in entries"
       :key="e.id"

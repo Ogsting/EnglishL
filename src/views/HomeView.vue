@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import SwipeCard from '../components/SwipeCard.vue'
-import { buildQueue, pool, recordGrade, state, stats, todayCount } from '../core/store'
+import { pool, recordGrade, state, stats, todayCount } from '../core/store'
+import { pickQueue } from '../core/queue'
 import type { Word } from '../core/types'
 
 const queue = ref<Word[]>([])
@@ -16,7 +17,7 @@ function rollSide() {
 }
 
 function reload(extra = 0) {
-  queue.value = buildQueue(pool.value, 60, extra)
+  queue.value = pickQueue(pool.value, 60, state.newPerDay + extra)
   idx.value = 0
   rollSide()
 }
@@ -58,7 +59,7 @@ function onGrade(r: 'know' | 'unknown') {
   </div>
 
   <div class="hint-row">
-    <span class="side"><i class="dot no" /> 左滑 · 不认识（进错题本）</span>
-    <span class="side"><i class="dot yes" /> 右滑 · 认识</span>
+    <span class="side"><i class="dot yes" /> 左滑 · 认识</span>
+    <span class="side"><i class="dot no" /> 右滑 · 不认识（进错题本）</span>
   </div>
 </template>

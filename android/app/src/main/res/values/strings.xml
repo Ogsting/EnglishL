@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EnglishL</string>
+    <string name="title_activity_main">EnglishL</string>
+    <string name="package_name">com.ogsting.englishl</string>
+    <string name="custom_url_scheme">com.ogsting.englishl</string>
+</resources>

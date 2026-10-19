@@ -9,6 +9,7 @@ import OwnView from './views/OwnView.vue'
 import WrongView from './views/WrongView.vue'
 import { ensureToday, state, theme } from './core/store'
 import { checkForUpdates } from './core/update'
+import { USE_THEME_IMAGES } from './config'
 
 ensureToday()
 
@@ -30,15 +31,58 @@ const SUBTITLE: Record<string, string> = {
   wrong: '错题本'
 }
 
-const vars = computed(() => ({
-  ...theme.value.colors,
-  '--font': theme.value.font,
-  '--radius': theme.value.radius
-}))
+/** 4.1 / 4.2 / 4.3 / 4.4 的图片开关，见 src/config.ts */
+const imgs = computed(() => (USE_THEME_IMAGES ? theme.value.images ?? {} : {}))
+
+const vars = computed(() => {
+  const i = imgs.value
+  return {
+    ...theme.value.colors,
+    '--font': theme.value.font,
+    '--radius': theme.value.radius,
+    ...(i.navBg ? { '--img-nav-bg': `url("${i.navBg}")` } : {}),
+    ...(i.ownPanel ? { '--img-own-panel': `url("${i.ownPanel}")` } : {}),
+    ...(i.wrongPanel ? { '--img-wrong-panel': `url("${i.wrongPanel}")` } : {}),
+    ...(i.cardFrame ? { '--img-card-frame': `url("${i.cardFrame}")` } : {}),
+    ...(i.rankBadge ? { '--img-rank-badge': `url("${i.rankBadge}")` } : {})
+  }
+})
+
+/** 4.1.x 每个页面自己的背景图 */
+const screenStyle = computed(() => {
+  const i = imgs.value
+  const bg = tab.value === 'home' ? i.homeBg : tab.value === 'own' ? i.ownBg : i.wrongBg
+  return bg ? { backgroundImage: `url("${bg}")` } : {}
+})
+
+/** 4.2 可移动装饰图 */
+const decor = computed(() => imgs.value.decor ?? [])
+
+function decorStyle(d: (typeof decor.value)[number]) {
+  return {
+    left: `${d.x}%`,
+    top: `${d.y}%`,
+    width: d.w ? `${d.w}%` : 'auto',
+    opacity: d.opacity ?? 1,
+    transform: d.rotate ? `rotate(${d.rotate}deg)` : undefined,
+    zIndex: d.z ?? 0
+  }
+}
 </script>
 
 <template>
-  <div class="app" :style="vars">
+  <div class="app" :class="{ pixelated: theme.pixelated }" :style="vars">
+    <!-- 4.2 可移动图片层（在内容之下，不挡点击） -->
+    <img
+      v-for="(d, i) in decor"
+      :key="'decor-' + i"
+      class="decor"
+      :src="d.src"
+      :style="decorStyle(d)"
+      alt=""
+      aria-hidden="true"
+    />
+
     <header class="topbar">
       <div class="brand">
         <span class="logo">E</span>
@@ -55,7 +99,7 @@ const vars = computed(() => ({
       </div>
     </header>
 
-    <main class="screen">
+    <main class="screen" :class="['screen-' + tab, { 'has-bg': !!screenStyle.backgroundImage }]" :style="screenStyle">
       <HomeView v-if="tab === 'home'" />
       <OwnView v-else-if="tab === 'own'" />
       <WrongView v-else />

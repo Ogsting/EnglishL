@@ -12,3 +12,17 @@ research/*
 
 # 工具产生的临时目录 / 截图
 *.tmpdir/
+.idea/
+.vscode/
+build.log
+
+# Android / Capacitor：原生工程入库，构建产物不入库
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+*.apk
+*.aab

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import SwipeCard from '../components/SwipeCard.vue'
-import { addOwnWord, buildQueue, recordGrade, removeOwnWord, state } from '../core/store'
+import { addOwnWord, recordGrade, removeOwnWord, state } from '../core/store'
+import { pickQueue } from '../core/queue'
 import type { Word } from '../core/types'
 
 const mode = ref<'list' | 'practice'>('list')
@@ -26,7 +27,8 @@ function rollSide() {
 }
 
 function startPractice() {
-  queue.value = buildQueue(state.own, 60, 999)
+  // 自建词全部进入本轮（newQuota 给足），复习历史照样记在各自词条上
+  queue.value = pickQueue(state.own, 60, 999)
   idx.value = 0
   rollSide()
   mode.value = 'practice'
@@ -63,7 +65,7 @@ onMounted(() => {
       <button class="btn" type="button" style="padding: 10px 14px" @click="add">加</button>
     </div>
 
-    <div class="list">
+    <div class="list panel-own">
       <div v-for="w in state.own" :key="w.id" class="row">
         <div class="inner">
           <div class="cn">{{ w.cn }}</div>
@@ -73,7 +75,7 @@ onMounted(() => {
       </div>
       <div v-if="state.own.length === 0" class="empty">
         <b>还没有自己的单词</b>
-        在上面输入英文和中文，加进来就能像首页一样左滑右滑
+        在上面输入英文和中文，加进来就能像首页一样滑动复习
       </div>
     </div>
   </template>
@@ -95,8 +97,8 @@ onMounted(() => {
     </div>
 
     <div class="hint-row">
-      <span class="side"><i class="dot no" /> 左滑 · 不认识</span>
-      <span class="side"><i class="dot yes" /> 右滑 · 认识</span>
+      <span class="side"><i class="dot yes" /> 左滑 · 认识</span>
+      <span class="side"><i class="dot no" /> 右滑 · 不认识</span>
     </div>
   </template>
 </template>

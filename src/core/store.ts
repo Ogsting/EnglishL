@@ -244,36 +244,8 @@ export function deleteWrong(id: string) {
 }
 
 /* ------------------------------------------------------------------ */
-/* 学习队列                                                            */
+/* 学习队列：见 core/queue.ts（加权随机）                                */
 /* ------------------------------------------------------------------ */
-
-export function buildQueue(source: Word[], limit = 60, extraNew = 0): Word[] {
-  ensureToday()
-  const now = Date.now()
-  const due = source
-    .filter((w) => {
-      const s = state.srs[w.id]
-      return s && s.seen > 0 && isDue(s, now)
-    })
-    .sort((a, b) => priority(state.srs[b.id], now) - priority(state.srs[a.id], now))
-
-  const quota = Math.max(
-    0,
-    state.newPerDay + extraNew - (state.newSeenDate === today() ? state.newSeen : 0)
-  )
-  const fresh = source
-    .filter((w) => !state.srs[w.id] || state.srs[w.id].seen === 0)
-    .slice(0, quota)
-
-  const out: Word[] = []
-  let f = 0
-  due.slice(0, limit).forEach((w, i) => {
-    out.push(w)
-    if (i % 4 === 3 && f < fresh.length) out.push(fresh[f++])
-  })
-  while (f < fresh.length && out.length < limit) out.push(fresh[f++])
-  return out
-}
 
 export const stats = computed(() => {
   let dueToday = 0

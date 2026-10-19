@@ -14,3 +14,12 @@ const fromQuery =
 
 export const WORD_BASE: string =
   fromQuery ?? ((import.meta.env.VITE_WORD_BASE as string | undefined) ?? '')
+
+/**
+ * 主题图片开关。
+ *
+ * 默认 false：还没放图时不会请求一堆 404。
+ * 你把图片放进 public/themes/minecraft/ 之后，把它改成 true 即可生效。
+ * 图片清单与尺寸见 docs/主题图片.md
+ */
+export const USE_THEME_IMAGES = false
