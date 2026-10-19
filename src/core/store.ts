@@ -22,6 +22,8 @@ interface Persisted {
   wordsVersion: number
   /** 联网增量更新留下的补丁结果（很小，可以放 localStorage） */
   wordOverrides: { added: Word[]; updated: Record<string, Word>; removed: string[] }
+  /** 发音 */
+  speak: { enabled: boolean; rate: number }
 }
 
 function defaults(): Persisted {
@@ -37,7 +39,8 @@ function defaults(): Persisted {
     newSeenDate: '',
     newSeen: 0,
     wordsVersion: 0,
-    wordOverrides: { added: [], updated: {}, removed: [] }
+    wordOverrides: { added: [], updated: {}, removed: [] },
+    speak: { enabled: true, rate: 0.9 }
   }
 }
 
@@ -51,7 +54,8 @@ function load(): Persisted {
       ...base,
       ...parsed,
       rank: { ...base.rank, ...(parsed.rank ?? {}) },
-      wordOverrides: { ...base.wordOverrides, ...(parsed.wordOverrides ?? {}) }
+      wordOverrides: { ...base.wordOverrides, ...(parsed.wordOverrides ?? {}) },
+      speak: { ...base.speak, ...(parsed.speak ?? {}) }
     }
   } catch {
     return defaults()

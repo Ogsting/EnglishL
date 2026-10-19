@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import type { Word } from '../core/types'
+import { speak, speechSupported } from '../core/speech'
+import { state } from '../core/store'
 
 const props = defineProps<{ word: Word; side: 'en' | 'zh' }>()
 const emit = defineEmits<{ (e: 'grade', r: 'know' | 'unknown'): void }>()
+
+function say() {
+  if (state.speak.enabled) speak(props.word.w, state.speak.rate)
+}
 
 /** 正面只显示第一个义项的前半段，避免中文长释义把卡片撑爆 */
 const promptCn = computed(() => {
@@ -27,6 +33,16 @@ const pending = ref<'' | 'left' | 'right'>('')
 
 let startX = 0
 let startY = 0
+
+// 英文面出现时读一次（中文面不能读，否则等于把答案念出来）
+onMounted(() => {
+  if (props.side === 'en') say()
+})
+
+// 翻到最终单词时再读一次
+watch(flipped, (v) => {
+  if (v) say()
+})
 
 const shellStyle = computed(() => {
   if (leaving.value) {
@@ -154,5 +170,16 @@ function onCancel() {
 
     <div class="stamp know" :style="{ opacity: knowStamp }">认识</div>
     <div class="stamp unknown" :style="{ opacity: unknownStamp }">不认识</div>
+
+    <button
+      v-if="speechSupported() && state.speak.enabled"
+      class="speak-btn"
+      type="button"
+      aria-label="再读一次"
+      @pointerdown.stop
+      @click.stop="say"
+    >
+      🔊
+    </button>
   </div>
 </template>

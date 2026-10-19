@@ -1,8 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './style.css'
+import { primeSpeech } from './core/speech'
 
 createApp(App).mount('#app')
+primeSpeech()
 
 if (import.meta.env.DEV && location.search.includes('demo')) {
   import('./dev/seed').then((m) => m.seedDemo())

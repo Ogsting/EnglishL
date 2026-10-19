@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { setTheme, state } from '../core/store'
 import { THEMES } from '../themes/themes'
+import { speak, speechSupported } from '../core/speech'
 
 const emit = defineEmits<{ (e: 'close'): void }>()
 
@@ -8,12 +9,60 @@ function pick(id: string) {
   setTheme(id)
   emit('close')
 }
+
+function trySpeak() {
+  speak('abandon', state.speak.rate)
+}
 </script>
 
 <template>
   <div class="mask" @click.self="emit('close')">
     <div class="sheet">
-      <h3>主题</h3>
+      <h3>设置</h3>
+
+      <!-- 发音 -->
+      <div class="setting-row">
+        <div class="meta">
+          <b>单词发音</b>
+          <small>
+            {{
+              speechSupported()
+                ? '英文面出现时读一次，翻到答案再读一次'
+                : '当前环境不支持语音（Android WebView 需要原生 TTS 插件）'
+            }}
+          </small>
+        </div>
+        <button
+          class="switch"
+          type="button"
+          :class="{ on: state.speak.enabled }"
+          :disabled="!speechSupported()"
+          @click="state.speak.enabled = !state.speak.enabled"
+        >
+          <i />
+        </button>
+      </div>
+
+      <div class="setting-row">
+        <div class="meta">
+          <b>语速</b>
+          <small>{{ state.speak.rate.toFixed(1) }}×</small>
+        </div>
+        <input
+          class="rate"
+          type="range"
+          min="0.6"
+          max="1.2"
+          step="0.05"
+          v-model.number="state.speak.rate"
+          :disabled="!state.speak.enabled || !speechSupported()"
+        />
+        <button class="btn ghost mini" type="button" :disabled="!speechSupported()" @click="trySpeak">
+          试听
+        </button>
+      </div>
+
+      <h3 style="margin-top: 18px">主题</h3>
       <div
         v-for="t in THEMES"
         :key="t.id"
@@ -33,8 +82,9 @@ function pick(id: string) {
         </div>
         <span v-if="state.themeId === t.id" style="color: var(--accent); font-size: 12px">使用中</span>
       </div>
+
       <p class="rules">
-        主题包同时决定：配色、字体、圆角、<b>段位材料名</b>、<b>错题材质梯度</b>。
+        主题包同时决定：配色、字体、圆角、<b>段位材料名</b>、<b>错题材质梯度</b>、<b>背景与装饰图</b>。
         我的世界主题下，段位是煤炭 → 铜 → 铁 → 金 → 钻石 → 基岩的进位制。
       </p>
     </div>
