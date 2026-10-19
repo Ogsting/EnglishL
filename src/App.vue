@@ -31,6 +31,37 @@ const SUBTITLE: Record<string, string> = {
   wrong: '错题本'
 }
 
+/**
+ * 弹层返回键处理：
+ * 打开时压一条历史记录，返回键（或浏览器后退）触发 popstate 就关掉弹层，
+ * 而不是直接退出 App。UI 上的关闭按钮同样走 history.back()。
+ */
+function openSheet(kind: 'theme' | 'rank') {
+  if (showTheme.value || showRank.value) return
+  if (kind === 'theme') showTheme.value = true
+  else showRank.value = true
+  history.pushState({ sheet: kind }, '')
+}
+
+function closeSheet() {
+  if (history.state?.sheet) {
+    history.back()
+    return
+  }
+  showTheme.value = false
+  showRank.value = false
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', () => {
+    showTheme.value = false
+    showRank.value = false
+  })
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && (showTheme.value || showRank.value)) closeSheet()
+  })
+}
+
 /** 4.1 / 4.2 / 4.3 / 4.4 的图片开关，见 src/config.ts */
 const imgs = computed(() => (USE_THEME_IMAGES ? theme.value.images ?? {} : {}))
 
@@ -92,10 +123,10 @@ function decorStyle(d: (typeof decor.value)[number]) {
         </div>
       </div>
       <div class="top-right">
-        <button class="icon-btn" type="button" aria-label="主题设置" @click="showTheme = true">
+        <button class="icon-btn" type="button" aria-label="设置" @click="openSheet('theme')">
           ⚙
         </button>
-        <RankBadge :coals="state.rank.coals" @open="showRank = true" />
+        <RankBadge :coals="state.rank.coals" @open="openSheet('rank')" />
       </div>
     </header>
 
@@ -107,7 +138,7 @@ function decorStyle(d: (typeof decor.value)[number]) {
 
     <TabBar v-model="tab" />
 
-    <ThemeSheet v-if="showTheme" @close="showTheme = false" />
-    <RankSheet v-if="showRank" @close="showRank = false" />
+    <ThemeSheet v-if="showTheme" @close="closeSheet" />
+    <RankSheet v-if="showRank" @close="closeSheet" />
   </div>
 </template>

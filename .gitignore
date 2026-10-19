@@ -26,3 +26,8 @@ android/app/src/main/assets/public/
 android/app/src/main/assets/capacitor.config.json
 *.apk
 *.aab
+
+# 签名文件绝不入库
+*.keystore
+*.jks
+android/keystore.properties
