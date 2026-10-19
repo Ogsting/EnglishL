@@ -7,7 +7,9 @@
     "dev": "vite",
     "dev:lan": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 4173"
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "apk": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-apk.ps1",
+    "apk:debug": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-apk.ps1 -Debug"
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^5.1.0",
