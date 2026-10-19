@@ -18,7 +18,10 @@ function trySpeak() {
 <template>
   <div class="mask" @click.self="emit('close')">
     <div class="sheet">
-      <h3>设置</h3>
+      <div class="sheet-head">
+        <h3>设置</h3>
+        <button class="sheet-close" type="button" aria-label="关闭" @click="emit('close')">✕</button>
+      </div>
 
       <!-- 发音 -->
       <div class="setting-row">

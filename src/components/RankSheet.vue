@@ -20,7 +20,10 @@ const nextInfo = computed(() => {
 <template>
   <div class="mask" @click.self="emit('close')">
     <div class="sheet">
-      <h3>段位</h3>
+      <div class="sheet-head">
+        <h3>段位</h3>
+        <button class="sheet-close" type="button" aria-label="关闭" @click="emit('close')">✕</button>
+      </div>
 
       <div class="rank-line" style="gap: 14px">
         <template v-for="(p, i) in parts" :key="p.power">

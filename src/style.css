@@ -533,12 +533,43 @@ body {
 .mask {
   position: absolute;
   inset: 0;
-  background: #00000088;
-  backdrop-filter: blur(2px);
+  background: #000000a8;
+  /* 不用 backdrop-filter：Android WebView 上全屏模糊会直接卡成幻灯片 */
   z-index: 20;
   display: flex;
   align-items: flex-end;
   animation: fade 0.2s ease;
+}
+
+/* 弹层标题栏 + 明确的关闭按钮 */
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 2px 0 12px;
+}
+
+.sheet-head h3 {
+  margin: 0;
+}
+
+.sheet-close {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--nav) 70%, transparent);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sheet-close:active {
+  transform: scale(0.92);
 }
 
 .sheet {
