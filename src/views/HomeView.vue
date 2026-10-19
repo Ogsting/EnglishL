@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import SwipeCard from '../components/SwipeCard.vue'
 import { pool, recordGrade, state, stats, todayCount } from '../core/store'
 import { pickQueue } from '../core/queue'
-import type { Word } from '../core/types'
+import type { Grade, Word } from '../core/types'
 
 const queue = ref<Word[]>([])
 const idx = ref(0)
@@ -24,7 +24,7 @@ function reload(extra = 0) {
 
 onMounted(() => reload())
 
-function onGrade(r: 'know' | 'unknown') {
+function onGrade(r: Grade) {
   if (!current.value) return
   recordGrade(current.value.id, r)
   idx.value += 1

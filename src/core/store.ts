@@ -231,7 +231,7 @@ export function recordGrade(wordId: string, result: Grade) {
   if (result === 'unknown') {
     const prev = state.wrong[wordId]?.count ?? 0
     state.wrong[wordId] = { count: prev + 1, last: Date.now() }
-  } else {
+  } else if (result === 'know') {
     const day = state.rank.days[today()]
     if (day) {
       day.count += 1
@@ -241,6 +241,7 @@ export function recordGrade(wordId: string, result: Grade) {
       }
     }
   }
+  // 'fuzzy'（模糊）：不计入今日达标，也不进错题本
 }
 
 export function deleteWrong(id: string) {

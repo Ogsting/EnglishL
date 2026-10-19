@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import SwipeCard from '../components/SwipeCard.vue'
 import { addOwnWord, recordGrade, removeOwnWord, state } from '../core/store'
 import { pickQueue } from '../core/queue'
-import type { Word } from '../core/types'
+import type { Grade, Word } from '../core/types'
 
 const mode = ref<'list' | 'practice'>('list')
 const en = ref('')
@@ -34,7 +34,7 @@ function startPractice() {
   mode.value = 'practice'
 }
 
-function onGrade(r: 'know' | 'unknown') {
+function onGrade(r: Grade) {
   if (!current.value) return
   recordGrade(current.value.id, r)
   idx.value += 1
