@@ -52,6 +52,19 @@ function closeSheet() {
   if (history.state?.sheet) history.back()
 }
 
+/* ---------------- 轻提示（返回键退出确认） ---------------- */
+const toast = ref('')
+let toastTimer: number | undefined
+let lastBackAt = 0
+
+function showToast(msg: string, ms = 2000) {
+  toast.value = msg
+  window.clearTimeout(toastTimer)
+  toastTimer = window.setTimeout(() => {
+    toast.value = ''
+  }, ms)
+}
+
 if (typeof window !== 'undefined') {
   window.addEventListener('popstate', () => {
     showTheme.value = false
@@ -63,18 +76,29 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * 安卓返回键：Capacitor 默认会直接退出 Activity，不经过网页历史。
- * 这里接管：弹层开着 → 关弹层；否则能后退就后退；不能才退出 App。
+ * 安卓返回键：
+ * 1. 弹层开着 → 关弹层
+ * 2. 不在首页 → 回首页
+ * 3. 在首页 → 连按两次才退出（第一次提示，2 秒内再按才真正退出）
  */
 if (Capacitor.isNativePlatform()) {
-  CapApp.addListener('backButton', ({ canGoBack }) => {
+  CapApp.addListener('backButton', () => {
     if (showTheme.value || showRank.value) {
       showTheme.value = false
       showRank.value = false
       return
     }
-    if (canGoBack) history.back()
-    else CapApp.exitApp()
+    if (tab.value !== 'home') {
+      tab.value = 'home'
+      return
+    }
+    const now = Date.now()
+    if (now - lastBackAt < 2000) {
+      CapApp.exitApp()
+      return
+    }
+    lastBackAt = now
+    showToast('再按一次返回键退出')
   })
 }
 
@@ -156,5 +180,7 @@ function decorStyle(d: (typeof decor.value)[number]) {
 
     <ThemeSheet v-if="showTheme" @close="closeSheet" />
     <RankSheet v-if="showRank" @close="closeSheet" />
+
+    <div v-if="toast" class="toast">{{ toast }}</div>
   </div>
 </template>
