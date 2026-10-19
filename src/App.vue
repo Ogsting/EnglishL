@@ -33,6 +33,10 @@ const SUBTITLE: Record<string, string> = {
   wrong: '错题本'
 }
 
+/** 三个页面用 KeepAlive 缓存：切 Tab 回来时卡片、进度、滚动位置都保持不变 */
+const VIEWS = { home: HomeView, own: OwnView, wrong: WrongView }
+const currentView = computed(() => VIEWS[tab.value])
+
 /**
  * 弹层返回键处理：
  * 打开时压一条历史记录，返回键（或浏览器后退）触发 popstate 就关掉弹层，
@@ -171,9 +175,9 @@ function decorStyle(d: (typeof decor.value)[number]) {
     </header>
 
     <main class="screen" :class="['screen-' + tab, { 'has-bg': !!screenStyle.backgroundImage }]" :style="screenStyle">
-      <HomeView v-if="tab === 'home'" />
-      <OwnView v-else-if="tab === 'own'" />
-      <WrongView v-else />
+      <KeepAlive>
+        <component :is="currentView" />
+      </KeepAlive>
     </main>
 
     <TabBar v-model="tab" />

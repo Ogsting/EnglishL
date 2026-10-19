@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import SwipeCard from '../components/SwipeCard.vue'
 import { addOwnWord, recordGrade, removeOwnWord, state } from '../core/store'
 import { pickQueue } from '../core/queue'
@@ -26,12 +26,36 @@ function rollSide() {
   side.value = Math.random() < 0.5 ? 'en' : 'zh'
 }
 
+/** 保存自建词的复习进度 */
+function persist() {
+  state.session.own = {
+    queue: queue.value.map((w) => w.id),
+    idx: idx.value,
+    side: side.value,
+    mode: mode.value
+  }
+}
+
+function restore(): boolean {
+  const s = state.session.own
+  if (!s || !s.queue?.length) return false
+  const map = new Map(state.own.map((w) => [w.id, w]))
+  const q = s.queue.map((id) => map.get(id)).filter((w): w is Word => !!w)
+  if (!q.length) return false
+  queue.value = q
+  idx.value = Math.min(s.idx ?? 0, q.length)
+  side.value = s.side ?? 'en'
+  mode.value = s.mode === 'practice' && q.length > 0 ? 'practice' : 'list'
+  return true
+}
+
 function startPractice() {
   // 自建词全部进入本轮（newQuota 给足），复习历史照样记在各自词条上
   queue.value = pickQueue(state.own, 60, 999)
   idx.value = 0
   rollSide()
   mode.value = 'practice'
+  persist()
 }
 
 function onGrade(r: Grade) {
@@ -41,8 +65,11 @@ function onGrade(r: Grade) {
   rollSide()
 }
 
+watch([idx, side, mode], persist)
+
 onMounted(() => {
-  if (state.own.length === 0) mode.value = 'list'
+  // 上次正在复习就恢复进度；否则看词条列表
+  if (!restore() && state.own.length === 0) mode.value = 'list'
 })
 </script>
 

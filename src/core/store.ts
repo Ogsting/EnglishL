@@ -24,6 +24,11 @@ interface Persisted {
   wordOverrides: { added: Word[]; updated: Record<string, Word>; removed: string[] }
   /** 发音 */
   speak: { enabled: boolean; rate: number }
+  /** 当前学习会话：切 Tab / 重启后恢复到同一张卡 */
+  session: {
+    home: { queue: string[]; idx: number; side: 'en' | 'zh' } | null
+    own: { queue: string[]; idx: number; side: 'en' | 'zh'; mode: 'list' | 'practice' } | null
+  }
 }
 
 function defaults(): Persisted {
@@ -40,7 +45,8 @@ function defaults(): Persisted {
     newSeen: 0,
     wordsVersion: 0,
     wordOverrides: { added: [], updated: {}, removed: [] },
-    speak: { enabled: true, rate: 0.9 }
+    speak: { enabled: true, rate: 0.9 },
+    session: { home: null, own: null }
   }
 }
 
@@ -55,7 +61,8 @@ function load(): Persisted {
       ...parsed,
       rank: { ...base.rank, ...(parsed.rank ?? {}) },
       wordOverrides: { ...base.wordOverrides, ...(parsed.wordOverrides ?? {}) },
-      speak: { ...base.speak, ...(parsed.speak ?? {}) }
+      speak: { ...base.speak, ...(parsed.speak ?? {}) },
+      session: { ...base.session, ...(parsed.session ?? {}) }
     }
   } catch {
     return defaults()
