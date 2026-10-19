@@ -12,6 +12,7 @@
   "dependencies": {
     "@capacitor-community/text-to-speech": "^5.1.0",
     "@capacitor/android": "^6.2.2",
+    "@capacitor/app": "^6.0.3",
     "@capacitor/core": "^6.2.2",
     "vue": "^3.5.13"
   },

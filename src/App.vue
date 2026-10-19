@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Capacitor } from '@capacitor/core'
+import { App as CapApp } from '@capacitor/app'
 import { computed, onMounted, ref } from 'vue'
 import TabBar from './components/TabBar.vue'
 import RankBadge from './components/RankBadge.vue'
@@ -44,12 +46,10 @@ function openSheet(kind: 'theme' | 'rank') {
 }
 
 function closeSheet() {
-  if (history.state?.sheet) {
-    history.back()
-    return
-  }
+  // 先无条件关掉，再尽量把历史记录清理掉（不依赖 popstate 是否触发）
   showTheme.value = false
   showRank.value = false
+  if (history.state?.sheet) history.back()
 }
 
 if (typeof window !== 'undefined') {
@@ -59,6 +59,22 @@ if (typeof window !== 'undefined') {
   })
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && (showTheme.value || showRank.value)) closeSheet()
+  })
+}
+
+/**
+ * 安卓返回键：Capacitor 默认会直接退出 Activity，不经过网页历史。
+ * 这里接管：弹层开着 → 关弹层；否则能后退就后退；不能才退出 App。
+ */
+if (Capacitor.isNativePlatform()) {
+  CapApp.addListener('backButton', ({ canGoBack }) => {
+    if (showTheme.value || showRank.value) {
+      showTheme.value = false
+      showRank.value = false
+      return
+    }
+    if (canGoBack) history.back()
+    else CapApp.exitApp()
   })
 }
 

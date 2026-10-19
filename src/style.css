@@ -572,6 +572,14 @@ body {
   transform: scale(0.92);
 }
 
+/* 弹层底部的大关闭按钮：手指好点 */
+.sheet-ok {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+}
+
 .sheet {
   width: 100%;
   background: var(--bg2);

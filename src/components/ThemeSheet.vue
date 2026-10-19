@@ -60,7 +60,14 @@ function trySpeak() {
           v-model.number="state.speak.rate"
           :disabled="!state.speak.enabled || !speechSupported()"
         />
-        <button class="btn ghost mini" type="button" :disabled="!speechSupported()" @click="trySpeak">
+      </div>
+
+      <div class="setting-row">
+        <div class="meta">
+          <b>试听</b>
+          <small>点一下听听这台机器的发音效果</small>
+        </div>
+        <button class="btn mini" type="button" :disabled="!speechSupported()" @click="trySpeak">
           试听
         </button>
       </div>
@@ -95,6 +102,8 @@ function trySpeak() {
         主题包同时决定：配色、字体、圆角、<b>段位材料名</b>、<b>错题材质梯度</b>、<b>背景与装饰图</b>。
         我的世界主题下，段位是煤炭 → 铜 → 铁 → 金 → 钻石 → 基岩的进位制。
       </p>
+
+      <button class="btn sheet-ok" type="button" @click="emit('close')">关闭</button>
     </div>
   </div>
 </template>
